@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="zh-CN">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSCA Chinese Exam Simulator V3</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      min-height: 100%;
+      width: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+      min-height: 100%;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2d3748;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #718096;
+    }
+
+    .exam-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .info-item {
+      background: #fff5f7;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #718096;
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #f5576c;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px 32px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #38a169;
+    }
+
+    .timer {
+      position: sticky;
+      top: 0;
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    .timer-text {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2d3748;
+    }
+
+    .timer-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #f5576c;
+    }
+
+    .question-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .passage-box {
+      background: #fff5f7;
+      border-left: 4px solid #f5576c;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      line-height: 1.8;
+      color: #2d3748;
+    }
+
+    .passage-title {
+      font-weight: bold;
+      color: #f5576c;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .question-number {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin-right: 12px;
+    }
+
+    .question-text {
+      font-size: 16px;
+      color: #2d3748;
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .option {
+      padding: 14px 18px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .option:hover {
+      border-color: #f5576c;
+      background: #fff5f7;
+    }
+
+    .option.selected {
+      border-color: #f5576c;
+      background: #fff5f7;
+    }
+
+    .option-label {
+      font-weight: bold;
+      margin-right: 12px;
+      color: #f5576c;
+    }
+
+    .result-section {
+      text-align: center;
+      padding: 32px;
+    }
+
+    .score-display {
+      font-size: 72px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 24px 0;
+    }
+
+    .score-text {
+      font-size: 24px;
+      color: #2d3748;
+      margin-bottom: 32px;
+    }
+
+    .review-question {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .correct-answer {
+      background: #c6f6d5;
+      border: 2px solid #48bb78;
+    }
+
+    .wrong-answer {
+      background: #fed7d7;
+      border: 2px solid #f56565;
+    }
+
+    .explanation {
+      background: #fff5f7;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 16px;
+      border-left: 4px solid #f5576c;
+    }
+
+    .explanation-title {
+      font-weight: bold;
+      color: #2d3748;
+      margin-bottom: 8px;
+    }
+
+    .explanation-text {
+      color: #4a5568;
+      line-height: 1.6;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      transition: width 0.3s ease;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container">
+   <div id="startScreen" class="card">
+    <div class="header">
+     <h1 class="title" id="examTitle">🎓 CSCA 文科中文模拟题 V3（完整版）</h1>
+     <p class="subtitle" id="examSubtitle">by lcnpalembang-08994477998</p>
+    </div>
+    <div class="exam-info">
+     <div class="info-item">
+      <div class="info-label">
+       考试时长
+      </div>
+      <div class="info-value">
+       90分钟
+      </div>
+     </div>
+     <div class="info-item">
+      <div class="info-label">
+       题目数量
+      </div>
+      <div class="info-value">
+       80题
+      </div>
+     </div>
+     <div class="info-item">
+      <div class="info-label">
+       得分范围
+      </div>
+      <div class="info-value">
+       0-100
+      </div>
+     </div>
+    </div><button class="btn btn-primary" id="startButton" onclick="startExam()">开始考试 / Mulai Ujian</button>
+   </div>
+   <div id="examScreen" class="hidden">
+    <div class="timer"><span class="timer-text">剩余时间:</span> <span class="timer-value" id="timerDisplay">90:00</span>
+    </div>
+    <div class="card">
+     <div class="progress-bar">
+      <div class="progress-fill" id="progressBar"></div>
+     </div>
+     <div id="questionsContainer"></div><button class="btn btn-success" id="submitButton" onclick="submitExam()">提交答案 / Submit</button>
+    </div>
+   </div>
+   <div id="resultScreen" class="hidden">
+    <div class="card">
+     <div class="result-section">
+      <h2 class="title">考试完成！</h2>
+      <div class="score-display" id="scoreDisplay">
+       0
+      </div>
+      <p class="score-text">您的得分 / Your Score</p><button class="btn btn-primary" onclick="showReview()">查看详细解析 / View Review</button>
+     </div>
+    </div>
+   </div>
+   <div id="reviewScreen" class="hidden">
+    <div class="card">
+     <h2 class="title">答案解析 / Answer Review</h2>
+     <div id="reviewContainer"></div><button class="btn btn-primary" onclick="restartExam()">重新开始 / Restart</button>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      exam_title: '🎓 CSCA 文科中文模拟题 V3（完整版）',
+      exam_subtitle: 'by lcnpalembang-08994477998',
+      start_button_text: '开始考试 / Mulai Ujian',
+      submit_button_text: '提交答案 / Submit'
+    };
+
+    let config = { ...defaultConfig };
+
+    const questions = [
+      {
+        section: 'A. 识解汉字',
+        question: '下列词语中"理"字表示"道理、真理"的是：',
+        options: ['理发', '理解', '真理', '整理'],
+        correct: 2,
+        explanation: '"真理"直接表示正确的道理。其他选项与"整理、处理"有关。'
+      },
+      {
+        section: 'A. 识解汉字',
+        question: '"思"字表示"思考、想法"的是：',
+        options: ['思想', '相思', '思念', '反思'],
+        correct: 0,
+        explanation: '"思想"最直接表示想法和观念。'
+      },
+      {
+        section: 'A. 识解汉字',
+        question: '"言"字与"语言、说话"相关的是：',
+        options: ['格言', '语言', '诺言', '预言'],
+        correct: 1,
+        explanation: '"语言"直接指说话和交流的工具。'
+      },
+      {
+        section: 'A. 识解汉字',
+        question: '"知"字表示"知识、了解"的是：',
+        options: ['知己', '知识', '通知', '知县'],
+        correct: 1,
+        explanation: '"知识"直接指学问和认知。'
+      },
+      {
+        section: 'A. 识解汉字',
+        question: '"信"字表示"相信、信任"的是：',
+        options: ['信封', '信念', '书信', '信箱'],
+        correct: 1,
+        explanation: '"信念"表示坚定的信仰和相信。'
+      },
+      {
+        section: 'A. 识解汉字',
+        question: '"德"字与"道德品质"相关的是：',
+        options: ['德国', '道德', '美德', '品德'],
+        correct: 3,
+        explanation: '"品德"最全面表示一个人的道德品质。'
+      },
+      {
+        section: 'A. 识解汉字',
+        question: '"性"字表示"性质、本性"的是：',
+        options: ['性别', '性格', '理性', '性质'],
+        correct: 3,
+        explanation: '"性质"直接表示事物的本质特征。'
+      },
+      {
+        section: 'A. 识解汉字',
+        question: '"情"字表示"情感"的是：',
+        options: ['情况', '感情', '情节', '情报'],
+        correct: 1,
+        explanation: '"感情"直接表达内心的情绪。'
+      },
+      {
+        section: 'A. 识解汉字',
+        question: '"道"字表示"道理、方法"的是：',
+        options: ['道路', '道德', '知道', '说道'],
+        correct: 1,
+        explanation: '"道德"包含做人的道理和规范。'
+      },
+      {
+        section: 'A. 识解汉字',
+        question: '"学"字表示"学习、学问"的是：',
+        options: ['学校', '学生', '科学', '学习'],
+        correct: 3,
+        explanation: '"学习"直接表示获取知识的行为。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '古代哲学家通过_______来探索世界的本质。',
+        options: ['思考', '旅游', '购物', '娱乐'],
+        correct: 0,
+        explanation: '哲学研究需要深入思考。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '艺术创作需要丰富的_______和创造力。',
+        options: ['金钱', '想象力', '时间', '工具'],
+        correct: 1,
+        explanation: '艺术创作离不开想象力。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '良好的品德需要从小_______。',
+        options: ['忽视', '培养', '批评', '放弃'],
+        correct: 1,
+        explanation: '品德需要长期培养形成。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '历史事件的真相需要通过_______来还原。',
+        options: ['猜测', '考证', '编造', '想象'],
+        correct: 1,
+        explanation: '历史研究需要严谨的考证。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '文化的传承需要每一代人的_______。',
+        options: ['努力', '破坏', '忘记', '拒绝'],
+        correct: 0,
+        explanation: '文化传承需要持续努力。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '社会进步离不开科技的_______。',
+        options: ['发展', '停滞', '倒退', '消失'],
+        correct: 0,
+        explanation: '科技发展推动社会进步。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '写作能力的提高需要大量的_______。',
+        options: ['阅读', '睡觉', '游戏', '看电视'],
+        correct: 0,
+        explanation: '阅读是提高写作的基础。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '批判性思维要求我们对信息进行_______。',
+        options: ['全盘接受', '仔细分析', '完全拒绝', '随意判断'],
+        correct: 1,
+        explanation: '批判思维需要仔细分析判断。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '传统文化在现代社会仍然具有_______价值。',
+        options: ['重要', '无用', '过时', '多余'],
+        correct: 0,
+        explanation: '传统文化依然有重要意义。'
+      },
+      {
+        section: 'B. 选词填空',
+        question: '学术研究必须保持_______的态度。',
+        options: ['随意', '严谨', '草率', '敷衍'],
+        correct: 1,
+        explanation: '学术研究需要严谨态度。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"探讨"最接近：',
+        options: ['研究', '放弃', '娱乐', '休息'],
+        correct: 0,
+        explanation: '探讨和研究都是深入了解事物。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"阐述"意思接近：',
+        options: ['解释', '隐瞒', '拒绝', '删除'],
+        correct: 0,
+        explanation: '阐述就是详细解释说明。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"见解"最接近：',
+        options: ['观点', '物品', '道路', '工具'],
+        correct: 0,
+        explanation: '见解就是个人的看法观点。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"思想"与哪个关系密切？',
+        options: ['观念', '食物', '建筑', '交通'],
+        correct: 0,
+        explanation: '思想和观念都是精神层面的内容。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"诠释"最接近：',
+        options: ['解读', '购买', '销售', '制造'],
+        correct: 0,
+        explanation: '诠释就是解释和说明意义。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"审视"意思接近：',
+        options: ['仔细观察', '快速浏览', '完全忽视', '随意看看'],
+        correct: 0,
+        explanation: '审视是认真仔细地观察。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"凸显"最接近：',
+        options: ['突出', '隐藏', '减少', '消除'],
+        correct: 0,
+        explanation: '凸显就是使某事物更加突出。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"蕴含"最接近：',
+        options: ['包含', '排斥', '拒绝', '删除'],
+        correct: 0,
+        explanation: '蕴含表示内部包含某种意义。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"框架"最接近：',
+        options: ['结构', '颜色', '味道', '声音'],
+        correct: 0,
+        explanation: '框架指事物的基本结构。'
+      },
+      {
+        section: 'C. 辨析词语',
+        question: '"演变"最接近：',
+        options: ['变化', '静止', '固定', '停止'],
+        correct: 0,
+        explanation: '演变表示逐渐变化的过程。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列段落：② 语言是文化的载体。③ 学习语言就是学习文化。④ 语言反映民族的思维方式。① 因此语言学习非常重要。',
+        options: ['②④③①', '①②③④', '④③②①', '③②①④'],
+        correct: 0,
+        explanation: '先说语言是载体，再说反映思维，然后说学语言是学文化，最后得出重要性。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列句子：① 环境保护关系人类未来。② 污染问题日益严重。③ 每个人都应该参与环保。④ 因此环保教育迫在眉睫。',
+        options: ['①②③④', '④③②①', '②①③④', '③④①②'],
+        correct: 0,
+        explanation: '说明环保重要，指出问题，提出要求，得出结论。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列句子：① 音乐能够表达情感。② 不同音乐风格反映不同文化。③ 音乐是跨越国界的语言。④ 所以音乐在文化交流中很重要。',
+        options: ['①②③④', '②①④③', '④①②③', '③②①④'],
+        correct: 0,
+        explanation: '说明音乐功能，列举特点，最后总结重要性。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列句子：① 诗歌是文学的精华。② 它用精炼的语言表达深刻含义。③ 诗歌培养人的审美能力。④ 因此诗歌教育不可忽视。',
+        options: ['①②③④', '④③②①', '②①③④', '③②④①'],
+        correct: 0,
+        explanation: '定义诗歌，说明特点，指出作用，得出结论。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列句子：① 科学精神强调实证。② 它要求我们用证据说话。③ 科学精神反对迷信。④ 因此培养科学精神很关键。',
+        options: ['①②③④', '③①②④', '②③①④', '④①②③'],
+        correct: 0,
+        explanation: '说明科学精神特点，逐层深入，最后总结。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列句子：① 民主制度需要公民参与。② 公民要了解自己的权利。③ 也要履行自己的义务。④ 因此公民教育十分必要。',
+        options: ['①②③④', '④①②③', '②③①④', '③①④②'],
+        correct: 0,
+        explanation: '提出要求，说明权利，指出义务，得出结论。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列句子：① 戏剧是综合艺术。② 它结合了文学、音乐、舞蹈等元素。③ 戏剧能够反映社会现实。④ 所以戏剧具有独特的艺术价值。',
+        options: ['①②③④', '②①③④', '③④①②', '④②①③'],
+        correct: 0,
+        explanation: '定义戏剧，说明特点，指出功能，总结价值。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列句子：① 批判性思维是重要能力。② 它让我们不盲目相信信息。③ 批判思维帮助我们做出正确判断。④ 因此学校应该重视思维训练。',
+        options: ['①②③④', '③②①④', '②③④①', '④①②③'],
+        correct: 0,
+        explanation: '提出概念，说明作用，指出好处，得出建议。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列句子：① 电影是视觉艺术。② 也是叙事艺术。③ 电影能够传播思想和价值观。④ 因此电影在文化传播中作用巨大。',
+        options: ['①②③④', '④①②③', '②①③④', '③④②①'],
+        correct: 0,
+        explanation: '介绍电影特点，说明功能，最后总结作用。'
+      },
+      {
+        section: 'D. 选词成段',
+        question: '排列句子：① 博物馆是文化宝库。② 它保存着人类文明的记忆。③ 参观博物馆能够增长见识。④ 因此博物馆教育应该普及。',
+        options: ['①②③④', '③①②④', '①③②④', '②①④③'],
+        correct: 0,
+        explanation: '定义博物馆，说明意义，指出作用，提出建议。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '要想理解一个文化，必须_______。',
+        options: ['深入学习', '表面了解', '完全拒绝', '随意评价'],
+        correct: 0,
+        explanation: '理解文化需要深入学习和体验。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '历史研究应该遵循_______的原则。',
+        options: ['客观真实', '主观臆断', '随意编造', '片面理解'],
+        correct: 0,
+        explanation: '历史研究必须客观和真实。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '一个成功的演讲需要_______。',
+        options: ['充分准备', '临时发挥', '照本宣科', '敷衍了事'],
+        correct: 0,
+        explanation: '好的演讲需要认真准备。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '分析社会现象要_______。',
+        options: ['全面客观', '片面主观', '凭空想象', '人云亦云'],
+        correct: 0,
+        explanation: '社会分析需要全面和客观。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '文学鉴赏需要具备_______。',
+        options: ['审美能力', '计算能力', '体育能力', '绘画能力'],
+        correct: 0,
+        explanation: '文学鉴赏需要审美能力。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '学习外语要多_______。',
+        options: ['练习', '抱怨', '逃避', '睡觉'],
+        correct: 0,
+        explanation: '外语学习需要大量练习。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '科学研究应该基于_______。',
+        options: ['事实证据', '个人喜好', '传统习惯', '道听途说'],
+        correct: 0,
+        explanation: '科学研究必须基于事实。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '哲学讨论需要参与者_______。',
+        options: ['理性思考', '情绪激动', '相互攻击', '回避问题'],
+        correct: 0,
+        explanation: '哲学讨论需要理性和逻辑。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '艺术评论要有_______。',
+        options: ['独立见解', '盲目跟风', '偏见成见', '敷衍态度'],
+        correct: 0,
+        explanation: '艺术评论需要独立思考。'
+      },
+      {
+        section: 'E. 补全语句',
+        question: '文化交流的目的是促进_______。',
+        options: ['相互理解', '文化冲突', '偏见加深', '交流中断'],
+        correct: 0,
+        explanation: '文化交流促进理解和尊重。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '文章主要讨论什么？',
+        options: ['中国历史', '科技发展的成就与挑战', '传统文化', '教育改革'],
+        correct: 1,
+        explanation: '文章核心讨论科技发展的成就和面临的挑战。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '文中提到的科技成就包括：',
+        options: ['传统手工艺', '高速铁路和移动支付', '古代建筑', '书法艺术'],
+        correct: 1,
+        explanation: '文中明确提到高铁、移动支付等科技成就。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '科技进步对经济的作用是：',
+        options: ['没有影响', '注入新动力', '造成破坏', '导致倒退'],
+        correct: 1,
+        explanation: '文中说科技为经济发展注入新动力。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '科技发展带来的挑战包括：',
+        options: ['交通拥堵', '数据安全问题', '天气变化', '人口增长'],
+        correct: 1,
+        explanation: '文中提到数据安全、隐私保护等挑战。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '"创新与伦理之间找到平衡"意思是：',
+        options: ['只关注创新', '科技发展要考虑道德', '放弃创新', '忽视伦理'],
+        correct: 1,
+        explanation: '科技发展需要在进步和道德之间平衡。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '科技改变了人们的：',
+        options: ['外貌', '生活方式', '性格', '身高'],
+        correct: 1,
+        explanation: '文中说科技改变生活方式。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '文章认为我们应该：',
+        options: ['拒绝科技', '盲目使用科技', '思考科技的合理使用', '停止创新'],
+        correct: 2,
+        explanation: '文章强调要思考如何让科技更好服务人类。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '隐私保护问题说明：',
+        options: ['科技没有问题', '科技需要规范', '应该放弃科技', '隐私不重要'],
+        correct: 1,
+        explanation: '科技发展需要相应的规范和保护措施。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '"令世界瞩目"说明：',
+        options: ['成就不大', '成就很显著', '没人关注', '很普通'],
+        correct: 1,
+        explanation: '令世界瞩目表示成就非常突出。'
+      },
+      {
+        section: 'F. 阅读一',
+        passage: '近年来，中国在科技领域取得了令世界瞩目的成就。从高速铁路到移动支付，从人工智能到5G网络，科技正在深刻改变着人们的生活方式。科技进步不仅提高了生活质量，也为经济发展注入了新动力。然而，科技发展也带来了一些挑战，比如数据安全、隐私保护等问题。因此，在享受科技便利的同时，我们也需要思考如何让科技更好地服务于人类，如何在创新与伦理之间找到平衡。只有这样，科技才能真正造福社会。',
+        question: '本文的态度是：',
+        options: ['完全反对科技', '客观看待科技', '盲目崇拜科技', '对科技无所谓'],
+        correct: 1,
+        explanation: '文章既肯定成就，也指出挑战，态度客观。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '文章主要讨论什么？',
+        options: ['现代科技', '中国传统艺术', '西方艺术', '体育运动'],
+        correct: 1,
+        explanation: '文章讨论中国传统艺术的特点和传承。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '书法的意义在于：',
+        options: ['只是写字', '精神修养和情感表达', '赚钱工具', '装饰作用'],
+        correct: 1,
+        explanation: '文中强调书法是精神修养和情感表达。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '中国画追求：',
+        options: ['完全写实', '意境和形神兼备', '抽象几何', '色彩鲜艳'],
+        correct: 1,
+        explanation: '文中说中国画强调意境，追求形神兼备。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '陶瓷艺术体现了：',
+        options: ['西方审美', '中国人对美的独特理解', '现代技术', '商业价值'],
+        correct: 1,
+        explanation: '文中说陶瓷体现中国人对美的独特理解。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '传统艺术承载了：',
+        options: ['娱乐功能', '哲学思想和审美观念', '经济价值', '政治意义'],
+        correct: 1,
+        explanation: '文中说艺术承载哲学思想和审美观念。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '当代传统艺术面临的挑战是：',
+        options: ['技术太简单', '传承与创新', '成本太低', '没有价值'],
+        correct: 1,
+        explanation: '文中明确说面临传承与创新的双重挑战。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '"源远流长"的意思是：',
+        options: ['刚刚出现', '历史悠久', '即将消失', '没有历史'],
+        correct: 1,
+        explanation: '源远流长表示历史悠久，源头久远。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '文章提出的问题是：',
+        options: ['如何赚钱', '如何让年轻人理解传统艺术', '如何出国', '如何考试'],
+        correct: 1,
+        explanation: '文章最后提出如何让年轻一代理解传统艺术。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '中国画不追求：',
+        options: ['意境', '形神兼备', '简单模仿自然', '文化内涵'],
+        correct: 2,
+        explanation: '文中说中国画"而非简单模仿自然"。'
+      },
+      {
+        section: 'G. 阅读二',
+        passage: '中国传统艺术源远流长，其中书法、绘画、陶瓷艺术最具代表性。书法不仅是书写技巧，更是一种精神修养，通过笔墨表达书写者的情感和气质。中国画强调"意境"，追求形神兼备，而非简单模仿自然。陶瓷艺术则体现了中国人对美的独特理解，从器形到釉色，都蕴含着深厚的文化内涵。这些艺术形式不仅是技艺的展示，更承载着中国人的哲学思想和审美观念。在当代社会，传统艺术面临着传承与创新的双重挑战，如何让年轻一代理解和喜爱传统艺术，是我们需要思考的问题。',
+        question: '本文的主旨是：',
+        options: ['批评传统艺术', '介绍传统艺术的价值和传承问题', '推广西方艺术', '艺术没有意义'],
+        correct: 1,
+        explanation: '文章介绍传统艺术特点和当代传承问题。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '文章主要讨论什么？',
+        options: ['古代历史', '中国家庭结构的变化', '经济发展', '科技进步'],
+        correct: 1,
+        explanation: '文章讨论中国家庭结构的变化及影响。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '传统中国家庭的理想模式是：',
+        options: ['独居', '三代同堂', '两代分居', '单身生活'],
+        correct: 1,
+        explanation: '文中说传统家庭以三代同堂为理想。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '现在主流的家庭模式是：',
+        options: ['三代同堂', '核心家庭', '大家族', '集体生活'],
+        correct: 1,
+        explanation: '文中说核心家庭逐渐成为主流。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '家庭结构变化的积极方面是：',
+        options: ['家庭关系更平等', '矛盾更多', '经济压力大', '孤独感强'],
+        correct: 0,
+        explanation: '文中说积极的一面包括家庭关系更平等。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '文中提到的新挑战包括：',
+        options: ['住房太大', '老人养老问题', '娱乐太多', '食物不够'],
+        correct: 1,
+        explanation: '文中明确提到老人养老等新挑战。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '亲情淡化的原因是：',
+        options: ['家人不爱了', '工作节奏快相处时间少', '住得太近', '经济富裕'],
+        correct: 1,
+        explanation: '文中说工作节奏加快使相处时间减少。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '传统家庭强调的美德是：',
+        options: ['个人主义', '孝道和家族观念', '自由放任', '物质追求'],
+        correct: 1,
+        explanation: '文中说传统家庭强调孝道和家族观念。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '当代家庭面临的课题是：',
+        options: ['如何赚更多钱', '保持传统美德同时适应现代', '完全抛弃传统', '回到古代'],
+        correct: 1,
+        explanation: '文章最后说要保持传统美德同时适应新环境。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '核心家庭是指：',
+        options: ['三代同堂', '父母和子女', '单身', '朋友同住'],
+        correct: 1,
+        explanation: '文中括号说明核心家庭是父母和子女。'
+      },
+      {
+        section: 'H. 阅读三',
+        passage: '中国传统家庭以"三代同堂"为理想模式，强调孝道和家族观念。然而，随着现代化进程的推进，中国家庭结构发生了巨大变化。核心家庭（父母和子女）逐渐成为主流，传统的大家庭模式越来越少见。这种变化既有积极的一面，如家庭关系更加平等，个人空间得到尊重；也带来了新的挑战，如老人养老问题、子女教育压力增大等。同时，工作节奏加快使得家庭成员相处时间减少，亲情淡化的现象引起社会关注。如何在现代生活中保持传统家庭美德，同时适应新的社会环境，是当代中国家庭面临的重要课题。',
+        question: '本文的态度是：',
+        options: ['完全否定现代家庭', '客观分析变化的利弊', '盲目崇拜传统', '对家庭不关心'],
+        correct: 1,
+        explanation: '文章客观分析了家庭变化的积极面和挑战。'
+      }
+    ];
+
+    let shuffledQuestions = [];
+    let userAnswers = [];
+    let timeRemaining = 5400;
+    let timerInterval;
+
+    function shuffle(array) {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    }
+
+    function startExam() {
+      shuffledQuestions = shuffle(questions);
+      shuffledQuestions.forEach(q => {
+        const indices = [0, 1, 2, 3];
+        const shuffledIndices = shuffle(indices);
+        q.shuffledOptions = shuffledIndices.map(i => q.options[i]);
+        q.correctIndex = shuffledIndices.indexOf(q.correct);
+      });
+
+      userAnswers = new Array(shuffledQuestions.length).fill(null);
+      
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('examScreen').classList.remove('hidden');
+      
+      renderQuestions();
+      startTimer();
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+
+      let lastPassage = '';
+      
+      shuffledQuestions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-card';
+        
+        let passageHtml = '';
+        if (q.passage && q.passage !== lastPassage) {
+          passageHtml = `
+            <div class="passage-box">
+              <div class="passage-title">📖 阅读短文：</div>
+              <div>${q.passage}</div>
+            </div>
+          `;
+          lastPassage = q.passage;
+        } else if (q.passage) {
+          lastPassage = q.passage;
+        } else {
+          lastPassage = '';
+        }
+        
+        let optionsHtml = '';
+        q.shuffledOptions.forEach((option, optIndex) => {
+          const isSelected = userAnswers[index] === optIndex;
+          optionsHtml += `
+            <div class="option ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${index}, ${optIndex})">
+              <span class="option-label">${String.fromCharCode(65 + optIndex)}.</span>
+              <span>${option}</span>
+            </div>
+          `;
+        });
+
+        questionDiv.innerHTML = `
+          ${passageHtml}
+          <div class="question-header">
+            <span class="question-number">${index + 1}</span>
+            <span class="question-text">${q.question}</span>
+          </div>
+          <div class="options">
+            ${optionsHtml}
+          </div>
+        `;
+        
+        container.appendChild(questionDiv);
+      });
+
+      updateProgress();
+    }
+
+    function selectAnswer(questionIndex, optionIndex) {
+      userAnswers[questionIndex] = optionIndex;
+      renderQuestions();
+    }
+
+    function updateProgress() {
+      const answered = userAnswers.filter(a => a !== null).length;
+      const percentage = (answered / shuffledQuestions.length) * 100;
+      document.getElementById('progressBar').style.width = percentage + '%';
+    }
+
+    function startTimer() {
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          submitExam();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      document.getElementById('timerDisplay').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function submitExam() {
+      clearInterval(timerInterval);
+      
+      let correctCount = 0;
+      shuffledQuestions.forEach((q, index) => {
+        if (userAnswers[index] === q.correctIndex) {
+          correctCount++;
+        }
+      });
+
+      const score = Math.round((correctCount / shuffledQuestions.length) * 100);
+      
+      document.getElementById('examScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+      document.getElementById('scoreDisplay').textContent = score;
+    }
+
+    function showReview() {
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('reviewScreen').classList.remove('hidden');
+      
+      const container = document.getElementById('reviewContainer');
+      container.innerHTML = '';
+
+      shuffledQuestions.forEach((q, index) => {
+        const isCorrect = userAnswers[index] === q.correctIndex;
+        const userAnswerText = userAnswers[index] !== null ? q.shuffledOptions[userAnswers[index]] : '未作答';
+        const correctAnswerText = q.shuffledOptions[q.correctIndex];
+
+        const reviewDiv = document.createElement('div');
+        reviewDiv.className = 'review-question';
+        
+        let passageHtml = '';
+        if (q.passage) {
+          passageHtml = `
+            <div class="passage-box" style="margin-bottom: 16px;">
+              <div class="passage-title">📖 阅读短文：</div>
+              <div>${q.passage}</div>
+            </div>
+          `;
+        }
+        
+        reviewDiv.innerHTML = `
+          ${passageHtml}
+          <div class="question-header">
+            <span class="question-number" style="background: ${isCorrect ? '#48bb78' : '#f56565'}">${index + 1}</span>
+            <span class="question-text">${q.question}</span>
+          </div>
+          <div style="margin-top: 16px;">
+            <div style="margin-bottom: 8px;">
+              <strong>您的答案：</strong>
+              <span style="color: ${isCorrect ? '#48bb78' : '#f56565'}; font-weight: bold;">
+                ${userAnswerText}
+              </span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              <strong>正确答案：</strong>
+              <span style="color: #48bb78; font-weight: bold;">
+                ${correctAnswerText}
+              </span>
+            </div>
+          </div>
+          <div class="explanation">
+            <div class="explanation-title">📖 解析：</div>
+            <div class="explanation-text">${q.explanation}</div>
+          </div>
+        `;
+        
+        container.appendChild(reviewDiv);
+      });
+    }
+
+    function restartExam() {
+      timeRemaining = 5400;
+      userAnswers = [];
+      shuffledQuestions = [];
+      
+      document.getElementById('reviewScreen').classList.add('hidden');
+      document.getElementById('startScreen').classList.remove('hidden');
+    }
+
+    async function onConfigChange(newConfig) {
+      const titleElement = document.getElementById('examTitle');
+      const subtitleElement = document.getElementById('examSubtitle');
+      const startButton = document.getElementById('startButton');
+      const submitButton = document.getElementById('submitButton');
+
+      if (titleElement) {
+        titleElement.textContent = newConfig.exam_title || defaultConfig.exam_title;
+      }
+      if (subtitleElement) {
+        subtitleElement.textContent = newConfig.exam_subtitle || defaultConfig.exam_subtitle;
+      }
+      if (startButton) {
+        startButton.textContent = newConfig.start_button_text || defaultConfig.start_button_text;
+      }
+      if (submitButton) {
+        submitButton.textContent = newConfig.submit_button_text || defaultConfig.submit_button_text;
+      }
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: () => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (cfg) => new Map([
+          ['exam_title', cfg.exam_title || defaultConfig.exam_title],
+          ['exam_subtitle', cfg.exam_subtitle || defaultConfig.exam_subtitle],
+          ['start_button_text', cfg.start_button_text || defaultConfig.start_button_text],
+          ['submit_button_text', cfg.submit_button_text || defaultConfig.submit_button_text]
+        ])
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a98089e5451b5d0',t:'MTc2NDk4NDc5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
